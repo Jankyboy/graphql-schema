@@ -6,6 +6,8 @@
 
 ## Usage
 
+### Validation
+
 ```js
 const { validate } = require("@octokit/graphql-schema");
 const errors = validate(`
@@ -27,6 +29,34 @@ schema.json; // JSON version
 schema.idl; // IDL version
 ```
 
+### Schema as Types
+
+```ts
+import { graphql } from "@octokit/graphql";
+import { Repository } from "@octokit/graphql-schema";
+
+const { repository } = await graphql<{ repository: Repository }>(
+  `
+    {
+      repository(owner: "octokit", name: "graphql.js") {
+        issues(last: 3) {
+          edges {
+            node {
+              title
+            }
+          }
+        }
+      }
+    }
+  `,
+  {
+    headers: {
+      authorization: `token secret123`,
+    },
+  }
+);
+```
+
 ## Local setup
 
 ```
@@ -36,22 +66,17 @@ npm install
 npm test
 ```
 
-Update schema files (`GH_TOKEN` requires no scope)
+Update schema files (`GITHUB_TOKEN` requires no scope)
 
 ```
-GH_TOKEN=... bin/download.js
-```
-
-Create pull request (after schema files changed). This script is run daily on Travis CI. The token requires `public_repo` scope.
-
-```
-GH_TOKEN=... TRAVIS_REPO_SLUG=octokit/graphql-schema bin/create-pull-request.js
+GITHUB_TOKEN=... npm run update
 ```
 
 ## See also
 
-- [octokit/routes](https://github.com/octokit/routes) – GitHub REST API route specifications
+- [octokit/openapi](https://github.com/octokit/openapi) – GitHub's OpenAPI specification with `x-octokit` extension
 - [octokit/webhooks](https://github.com/octokit/webhooks) – GitHub Webhooks specifications
+- [octokit/app-permissions](https://github.com/octokit/app-permissions) – GitHub App permission specifications
 
 ## LICENSE
 
